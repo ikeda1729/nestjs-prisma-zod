@@ -1,18 +1,17 @@
 import {
   Controller,
-  Get,
   Post,
   Body,
-  Patch,
+  Get,
   Param,
-  Delete,
+  HttpException,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { zodToOpenAPI } from 'nestjs-zod';
-import { UserSchema } from 'prisma/generated/zod';
 import { ApiBody, ApiOkResponse } from '@nestjs/swagger';
 import { CreateUserDto, CreateUserSchema } from './dto/create-user.dto';
-
+import { PostSchema, UserSchema } from 'src/generated/zod';
+import { z } from 'zod';
 
 @Controller('users')
 export class UsersController {
@@ -25,27 +24,20 @@ export class UsersController {
   @ApiOkResponse({
     schema: zodToOpenAPI(UserSchema),
   })
-  create(@Body() createUserDto: CreateUserDto) {
-    return this.usersService.create(createUserDto);
+  async create(@Body() createUserDto: CreateUserDto) {
+    try {
+      return await this.usersService.create(createUserDto);
+    } catch (e: any) {
+      if (e.code === 'P2002')
+        throw new HttpException('User already exists', 409);
+    }
   }
 
-  @Get()
-  findAll() {
-    // return this.usersService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    // return this.usersService.findOne(+id);
-  }
-
-  // @Patch(':id')
-  // update(@Param('id') id: string, @Body() updateUserDto: UpdateUserDto) {
-  // return this.usersService.update(+id, updateUserDto);
-  // }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    // return this.usersService.remove(+id);
+  @Get(':id/posts')
+  @ApiOkResponse({
+    schema: zodToOpenAPI(z.array(PostSchema)),
+  })
+  async getPosts(@Param('id') id: number) {
+    return await this.usersService.getPosts(id);
   }
 }

@@ -1,14 +1,18 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma.service';
-import { User, Prisma } from '@prisma/client';
-import { createZodDto } from 'nestjs-zod';
-import { UserCreateInputSchema } from 'prisma/generated/zod';
+import { CreateUserDto } from './dto/create-user.dto';
 
 @Injectable()
 export class UsersService {
   constructor(private prisma: PrismaService) {}
 
-  async create(user: Prisma.UserCreateInput): Promise<User> {
-    return this.prisma.user.create({ data: user });
+  async create(dto: CreateUserDto) {
+    return await this.prisma.user.create({ data: dto });
+  }
+
+  async getPosts(id: number) {
+    const posts = await this.prisma.user.findUnique({ where: { id } }).posts();
+    if (!posts) throw new HttpException('User not found', 404)
+    return posts
   }
 }

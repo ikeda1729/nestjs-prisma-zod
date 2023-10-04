@@ -6,5 +6,14 @@ export const CreateUserSchema = z.object({
   name: z.string(),
 })
 
-// class is required for using DTO as a type
 export class CreateUserDto extends createZodDto(CreateUserSchema) {}
+
+// import { IsEmail, IsNotEmpty, IsString } from 'class-validator';
+
+// export class CreateUserDto {
+//   @IsEmail()
+//   email: string;
+
+//   @IsNotEmpty()
+//   name: string;
+// }

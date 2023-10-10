@@ -25,6 +25,7 @@ export class UsersController {
     schema: zodToOpenAPI(UserSchema),
   })
   async create(@Body() createUserDto: CreateUserDto) {
+    console.log("🚀 ~ file: users.controller.ts:28 ~ UsersController ~ create ~ createUserDto:", createUserDto)
     try {
       return await this.usersService.create(createUserDto);
     } catch (e: any) {
